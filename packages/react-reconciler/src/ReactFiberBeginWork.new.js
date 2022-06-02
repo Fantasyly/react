@@ -1024,8 +1024,30 @@ function updateFunctionComponent(
   return workInProgress.child;
 }
 
+/**
+ * 在React中最多会同时存在两棵Fiber树。
+ * 当前屏幕上显示内容对应的Fiber树称为current Fiber树，
+ * 正在内存中构建的Fiber树称为workInProgress Fiber树。
+ * 
+ * current Fiber树中的Fiber节点被称为current fiber，
+ * workInProgress Fiber树中的Fiber节点被称为workInProgress fiber，
+ * 他们通过alternate属性连接。
+ * 
+ * @param {*} current 
+ * 在初始化更新中，current = null ，
+ * 在第一次 fiber 调和之后，会将 workInProgress 树赋值给 current 树。
+ * React 来用workInProgress 和 current 来确保一次更新中，快速构建，并且状态不丢失。
+ * @param {*} workInProgress 
+ * workInProgress 树，当前正在调和的 fiber 树 ，一次更新中，
+ * React 会自上而下深度遍历子代 fiber ，
+ * 如果遍历到一个 fiber ，会把当前 fiber 指向 workInProgress。
+ * @param {*} Component  项目中的类组件
+ * @param {*} nextProps 
+ * @param {*} renderLanes 
+ * @returns 
+ */
 function updateClassComponent(
-  current: Fiber | null,
+  current: Fiber | null, 
   workInProgress: Fiber,
   Component: any,
   nextProps: any,
@@ -1091,8 +1113,10 @@ function updateClassComponent(
   }
   prepareToReadContext(workInProgress, renderLanes);
 
+  // stateNode 是 fiber 指向 类组件实例的指针。
   const instance = workInProgress.stateNode;
   let shouldUpdate;
+  // instance 为组件实例,如果组件实例不存在，证明该类组件没有被挂载过，那么会走初始化流程
   if (instance === null) {
     if (current !== null) {
       // A class component without an instance only mounts if it suspended
@@ -1105,8 +1129,11 @@ function updateClassComponent(
       workInProgress.flags |= Placement;
     }
     // In the initial pass we might need to construct the instance.
+    // new 组件实例
     constructClassInstance(workInProgress, Component, nextProps);
+    // 初始化挂载组件流程
     mountClassInstance(workInProgress, Component, nextProps, renderLanes);
+    // 标识组件是否更新
     shouldUpdate = true;
   } else if (current === null) {
     // In a resume, we'll already have an instance we can reuse.
@@ -1117,6 +1144,7 @@ function updateClassComponent(
       renderLanes,
     );
   } else {
+    // 更新组件流程
     shouldUpdate = updateClassInstance(
       current,
       workInProgress,

@@ -52,8 +52,11 @@ export function batchedUpdates(fn, a, b) {
   }
   isInsideEventHandler = true;
   try {
+    /* 这里执行了的事件处理函数， 比如在一次点击事件中触发setState,那么它将在这个函数内执行 */
     return batchedUpdatesImpl(fn, a, b);
   } finally {
+    /* try 里面 return 不会影响 finally 执行  */
+    /* 完成一次事件，批量更新  */
     isInsideEventHandler = false;
     finishEventHandler();
   }

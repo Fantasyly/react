@@ -249,14 +249,15 @@ export function isValidContainer(node: any): boolean {
   );
 }
 
+// 校验 应用的外部容器的根节点  <div id='root'></div>
 // TODO: Remove this function which also includes comment nodes.
 // We only use it in places that are currently more relaxed.
 export function isValidContainerLegacy(node: any): boolean {
   return !!(
     node &&
-    (node.nodeType === ELEMENT_NODE ||
-      node.nodeType === DOCUMENT_NODE ||
-      node.nodeType === DOCUMENT_FRAGMENT_NODE ||
+    (node.nodeType === ELEMENT_NODE || // 普通的dom节点 div span等
+      node.nodeType === DOCUMENT_NODE || // document 根节点
+      node.nodeType === DOCUMENT_FRAGMENT_NODE || 
       (node.nodeType === COMMENT_NODE &&
         (node: any).nodeValue === ' react-mount-point-unstable '))
   );

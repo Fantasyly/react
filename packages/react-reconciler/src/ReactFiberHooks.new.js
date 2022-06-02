@@ -369,12 +369,12 @@ function areHookInputsEqual(
 }
 
 export function renderWithHooks<Props, SecondArg>(
-  current: Fiber | null,
-  workInProgress: Fiber,
-  Component: (p: Props, arg: SecondArg) => any,
-  props: Props,
-  secondArg: SecondArg,
-  nextRenderLanes: Lanes,
+  current: Fiber | null, // 当前函数组件对应的fiber初始化
+  workInProgress: Fiber, // 当前正在工作的fiber对象
+  Component: (p: Props, arg: SecondArg) => any, // 我们写的函数组件
+  props: Props, // props
+  secondArg: SecondArg, // 函数组件其他参数
+  nextRenderLanes: Lanes, // 下次渲染过期时间
 ): any {
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
@@ -427,6 +427,7 @@ export function renderWithHooks<Props, SecondArg>(
         : HooksDispatcherOnUpdate;
   }
 
+  /* 执行我们的函数组件，得到 return 返回的 React.element对象 */
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update

@@ -33,6 +33,7 @@ function FiberRootNode(containerInfo, tag, hydrate) {
   this.tag = tag;
   this.containerInfo = containerInfo;
   this.pendingChildren = null;
+  // 当前fiberRootNode对应的rootFiber
   this.current = null;
   this.pingCache = null;
   this.finishedWork = null;
@@ -101,18 +102,21 @@ export function createFiberRoot(
   isStrictMode: boolean,
   concurrentUpdatesByDefaultOverride: null | boolean,
 ): FiberRoot {
+  // 创建FiberRootNode  FiberRootNode是整个应用的根节点
   const root: FiberRoot = (new FiberRootNode(containerInfo, tag, hydrate): any);
-  if (enableSuspenseCallback) {
+  if (enableSuspenseCallback)  {
     root.hydrationCallbacks = hydrationCallbacks;
   }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
+  // 这一步是创建rootFriber，rootFiber是<App/>所在树的根节点
   const uninitializedFiber = createHostRootFiber(
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
+  // fiberRootNode的current会指向当前页面上已渲染内容对应Fiber树，即current Fiber树。
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
 

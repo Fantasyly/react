@@ -14,10 +14,15 @@ if (__DEV__) {
   Object.freeze(emptyObject);
 }
 
+// 这个就是最终暴露出去的React.Component
 /**
  * Base class helpers for the updating state of a component.
  */
 function Component(props, context, updater) {
+  // 在 class 组件中，除了继承 React.Component ，
+  // 底层还加入了 updater 对象，
+  // 组件中调用的 setState 和 forceUpdate 
+  // 本质上是调用了 updater 对象上的 enqueueSetState 和 enqueueForceUpdate 方法。
   this.props = props;
   this.context = context;
   // If a component has string refs, we will assign a different object later.
@@ -54,6 +59,7 @@ Component.prototype.isReactComponent = {};
  * @final
  * @protected
  */
+// 绑定setState方法
 Component.prototype.setState = function(partialState, callback) {
   invariant(
     typeof partialState === 'object' ||
@@ -79,9 +85,15 @@ Component.prototype.setState = function(partialState, callback) {
  * @final
  * @protected
  */
+/* 绑定forceupdate 方法 */
 Component.prototype.forceUpdate = function(callback) {
   this.updater.enqueueForceUpdate(this, callback, 'forceUpdate');
 };
+/**
+ * 如上可以看出 Component 底层 React 的处理逻辑是，
+ * 类组件执行构造函数过程中会在实例上绑定 props 和 context ，
+ * 初始化置空 refs 属性，原型链上绑定setState、forceUpdate 方法。对于 updater，React 在实例化类组件之后会单独绑定 update 对象。
+ */
 
 /**
  * Deprecated APIs. These APIs used to exist on classic React classes but since

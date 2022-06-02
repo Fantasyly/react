@@ -102,13 +102,21 @@ function getReactRootElementInContainer(container: any) {
     return container.firstChild;
   }
 }
-
+/**
+ *  首次渲染的时候 container上没有_reactRootContainer
+ *  调用该方法进行创建
+ *  root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
+      container,
+      forceHydrate,
+    ); 
+ */
 function legacyCreateRootFromDOMContainer(
   container: Container,
-  forceHydrate: boolean,
+  forceHydrate: boolean, // false
 ): FiberRoot {
   // First clear any existing content.
   if (!forceHydrate) {
+    // 清空container 防止container里有东西
     let rootSibling;
     while ((rootSibling = container.lastChild)) {
       container.removeChild(rootSibling);
@@ -144,12 +152,17 @@ function warnOnInvalidCallback(callback: mixed, callerName: string): void {
     }
   }
 }
-
+// ReactDOM.render里调用时的传参
+// null,
+// element, 就是<App/>
+// container, <div id='root'></div>
+// false,
+// callback,
 function legacyRenderSubtreeIntoContainer(
-  parentComponent: ?React$Component<any, any>,
+  parentComponent: ?React$Component<any, any>, 
   children: ReactNodeList,
   container: Container,
-  forceHydrate: boolean,
+  forceHydrate: boolean, // 是否是服务端渲染
   callback: ?Function,
 ) {
   if (__DEV__) {
@@ -157,14 +170,15 @@ function legacyRenderSubtreeIntoContainer(
     warnOnInvalidCallback(callback === undefined ? null : callback, 'render');
   }
 
-  let root = container._reactRootContainer;
+  let root = container._reactRootContainer; // 一个标志位，一开始是没有的
   let fiberRoot: FiberRoot;
   if (!root) {
     // Initial mount
+    // 没有这个标志位的时候 去创建
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
-    );
+    ); 
     fiberRoot = root;
     if (typeof callback === 'function') {
       const originalCallback = callback;
@@ -264,9 +278,11 @@ export function hydrate(
   );
 }
 
+// 入口方法 render ReactDOM.render(<App/>, root)
+// 创建react整个应用顶点对象
 export function render(
-  element: React$Element<any>,
-  container: Container,
+  element: React$Element<any>, // JSX 通过babel编译成 React.createElement得到ReactElement 
+  container: Container, // document.getElementById('root')
   callback: ?Function,
 ) {
   if (__DEV__) {
@@ -279,10 +295,11 @@ export function render(
   }
 
   invariant(
+    // 对container进行校验
     isValidContainerLegacy(container),
     'Target container is not a DOM element.',
   );
-  if (__DEV__) {
+  if (__DEV__) { 
     const isModernRoot =
       isContainerMarkedAsRoot(container) &&
       container._reactRootContainer === undefined;

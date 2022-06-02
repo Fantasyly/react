@@ -237,21 +237,32 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
+/**
+ * 创建container._reactRootContainer
+ * const root = createContainer(
+    container,
+    LegacyRoot,
+    forceHydrate,
+    null, // hydrationCallbacks
+    false, // isStrictMode
+    false, // concurrentUpdatesByDefaultOverride,
+  );
+ */
 export function createContainer(
   containerInfo: Container,
   tag: RootTag,
-  hydrate: boolean,
+  hydrate: boolean, // false
   hydrationCallbacks: null | SuspenseHydrationCallbacks,
   isStrictMode: boolean,
   concurrentUpdatesByDefaultOverride: null | boolean,
 ): OpaqueRoot {
   return createFiberRoot(
-    containerInfo,
-    tag,
-    hydrate,
-    hydrationCallbacks,
-    isStrictMode,
-    concurrentUpdatesByDefaultOverride,
+    containerInfo, // <div></div>
+    tag, // 0
+    hydrate, // false
+    hydrationCallbacks, // null
+    isStrictMode, // false
+    concurrentUpdatesByDefaultOverride, // false
   );
 }
 
